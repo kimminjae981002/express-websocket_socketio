@@ -1,17 +1,16 @@
-const ws = new WebSocket("ws://localhost:7071/ws");
+const socket = io("ws://localhost:3000");
 
-// server index.js에서 보내는 메시지와 객체 확인가능
-ws.onmessage = (webSocketMessage) => {
-  console.log(webSocketMessage);
-  console.log(webSocketMessage.data);
-};
+// 서버에서 데이터 받는 걸 on으로 받는다.
+socket.on("message", (text) => {
+  const el = document.createElement("li");
+  el.innerHTML = text;
 
-// 마우스가 이동할 때마다  실시간으로 데이터를 서버에게 보내준다.
-document.body.onmousemove = (event) => {
-  console.log(event);
-  const messageBody = {
-    x: event.clientX,
-    y: event.clientY,
-  };
-  ws.send(JSON.stringify(messageBody), console.log(event));
+  document.querySelector("ul").appendChild(el);
+});
+
+document.querySelector("button").onclick = () => {
+  const text = document.querySelector("input").value;
+
+  // 클라이언트에서 데이터 보내는 걸 emit으로 보낸다.
+  socket.emit("message1", text);
 };
