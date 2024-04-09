@@ -1,13 +1,21 @@
-const WebSocket = require("ws");
-const wss = new WebSocket.Server({ port: 7071 });
+const http = require("http").createServer();
 
-// 클라이언트에게 보내주는 메시지
-wss.on("connection", (ws) => {
-  ws.send("connected");
+const io = require("socket.io")(http, {
+  cors: { origin: "*" },
+});
 
-  // client에서 보내는 메시지 확인가능
-  ws.on("message", (messageFromClient) => {
-    const message = JSON.parse(messageFromClient);
-    console.log(message);
+// socket 연결
+io.on("connection", (socket) => {
+  console.log("a user connected");
+
+  // client에서 오는 걸 on으로 받아준다.
+  socket.on("message1", (message) => {
+    // 누가 보냈는지는 socket.id에 있다.
+    // client로 emit으로 보낸다.
+    io.emit("message", `${socket.id.substr(0, 2)} said ${message}`);
   });
+});
+
+http.listen("3000", () => {
+  console.log("3000 오픈");
 });
